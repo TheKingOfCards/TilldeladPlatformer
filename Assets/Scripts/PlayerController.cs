@@ -10,6 +10,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb2d;
+    Animator animator;
     [SerializeField] Transform groundCheck;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckRadius = .1f;
@@ -17,6 +18,7 @@ public class PlayerController : MonoBehaviour
     float x;
     [SerializeField] int speed = 5;
     [SerializeField] int jumpingPower = 100;
+    [SerializeField] float earlyFall = 0.5f;
     bool canJump = true;
 
     bool isFacingRight = true;
@@ -25,6 +27,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
 
@@ -32,11 +35,24 @@ public class PlayerController : MonoBehaviour
     {
         //X movement
         x = Input.GetAxisRaw("Horizontal");
+        
+        animator.SetFloat("Speed", Mathf.Abs(x));
 
         Vector2 movement = new(x, 0);
 
+        Jump();
+        Flip();
+    }
 
-        //Jumping
+
+    void FixedUpdate()
+    {
+        rb2d.velocity = new Vector2(x * speed * Time.deltaTime * 50, rb2d.velocity.y);
+    }
+
+
+    void Jump()
+    {
         if (Input.GetAxisRaw("Jump") > 0 && canJump == true && isGrounded())
         {
             Vector2 jump = Vector2.up * jumpingPower;
@@ -45,25 +61,15 @@ public class PlayerController : MonoBehaviour
             canJump = false;
         }
 
-
         if (Input.GetAxisRaw("Jump") == 0)
         {
             canJump = true;
 
             if(rb2d.velocity.y > 0f)
             {
-                rb2d.velocity = new Vector2(rb2d.velocity.x, rb2d.velocity.y * 0.5f);
+                rb2d.velocity = new Vector2(rb2d.velocity.x, rb2d.velocity.y * earlyFall);
             }
         }
-
-
-        Flip();
-    }
-
-
-    void FixedUpdate()
-    {
-        rb2d.velocity = new Vector2(x * speed * Time.deltaTime * 50, rb2d.velocity.y);
     }
 
 
