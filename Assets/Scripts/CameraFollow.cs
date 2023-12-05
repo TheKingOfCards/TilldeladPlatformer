@@ -1,3 +1,4 @@
+using System.Runtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,5 @@ public class CameraFollow : MonoBehaviour
         newPos += Vector3.right * target.localScale.x;
         
         transform.position = Vector3.Slerp(transform.position, newPos, transitionSpeed * Time.deltaTime);
-
     }
 }

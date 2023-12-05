@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckRadius = .1f;
 
+    [SerializeField] GameOverScreen GOS;
+
     float x;
     [SerializeField] int speed = 5;
     [SerializeField] int jumpingPower = 100;
@@ -35,8 +37,8 @@ public class PlayerController : MonoBehaviour
     {
         //X movement
         x = Input.GetAxisRaw("Horizontal");
-        
-        animator.SetFloat("Speed", Mathf.Abs(x));
+
+        animator.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
 
         Vector2 movement = new(x, 0);
 
@@ -65,17 +67,31 @@ public class PlayerController : MonoBehaviour
         {
             canJump = true;
 
-            if(rb2d.velocity.y > 0f)
+            if (rb2d.velocity.y > 0f)
             {
                 rb2d.velocity = new Vector2(rb2d.velocity.x, rb2d.velocity.y * earlyFall);
             }
+        }
+
+        animator.SetFloat("yvelocity", rb2d.velocity.y);
+        
+        animator.SetBool("Grounded", isGrounded());
+    }
+
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.CompareTag("Death"))
+        {
+            GOS.Setup();
+            Destroy(gameObject);
         }
     }
 
 
     private void Flip()
     {
-        if(isFacingRight && x < 0f || !isFacingRight && x > 0f)
+        if (isFacingRight && x < 0f || !isFacingRight && x > 0f)
         {
             isFacingRight = !isFacingRight;
             Vector3 scale = transform.localScale;
