@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     float x;
     [SerializeField] int speed = 5;
     [SerializeField] int jumpingPower = 100;
+    [SerializeField] int enemyBounce = 100;
     [SerializeField] float earlyFall = 0.5f;
     bool canJump = true;
 
@@ -39,8 +40,6 @@ public class PlayerController : MonoBehaviour
         x = Input.GetAxisRaw("Horizontal");
 
         animator.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
-
-        Vector2 movement = new(x, 0);
 
         Jump();
         Flip();
@@ -74,14 +73,27 @@ public class PlayerController : MonoBehaviour
         }
 
         animator.SetFloat("yvelocity", rb2d.velocity.y);
-        
+
         animator.SetBool("Grounded", isGrounded());
     }
 
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.CompareTag("Death"))
+        if (other.CompareTag("Death"))
+        {
+            GOS.Setup();
+            Destroy(gameObject);
+        }
+
+        if (other.CompareTag("KillEnemy"))
+        {
+            Destroy(other.transform.parent.gameObject);
+            // Vector2 jump = Vector2.up * jumpingPower * enemyBounce;
+            // rb2d.AddForce(jump);
+        }
+
+        if(other.CompareTag("KillPlayer"))
         {
             GOS.Setup();
             Destroy(gameObject);
